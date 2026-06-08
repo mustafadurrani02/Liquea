@@ -19,7 +19,7 @@ function createWindow(): void {
     vibrancy: 'under-window',
     visualEffectState: 'active',
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.cjs'),
       contextIsolation: true,
       sandbox: true,
       nodeIntegration: false
@@ -30,14 +30,35 @@ function createWindow(): void {
   registerIpc(controller)
   installMenu(controller)
 
-  if (process.env.ELECTRON_RENDERER_URL) {
-    void mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
-  } else {
-    void mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+  mainWindow.webContents.on('preload-error', (_event, preloadPath, error) => {
+    console.error(`Liquea preload failed at ${preloadPath}:`, error)
+  })
+
+  const rendererReady = process.env.ELECTRON_RENDERER_URL
+    ? mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL)
+    : mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+
+  void rendererReady.catch((error: unknown) => {
+    console.error('Failed to load the Liquea renderer:', error)
+  })
 
   mainWindow.webContents.once('did-finish-load', () => {
     void controller?.initialize()
+  })
+  mainWindow.webContents.on(
+    'did-fail-load',
+    (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+      if (isMainFrame) {
+        console.error('Liquea renderer failed to load', {
+          errorCode,
+          errorDescription,
+          validatedURL
+        })
+      }
+    }
+  )
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    console.error('Liquea browser chrome renderer exited', details)
   })
   mainWindow.on('closed', () => {
     mainWindow = null
