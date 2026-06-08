@@ -55,13 +55,16 @@
     ],
     "mac": {
       "category": "public.app-category.productivity",
+      "icon": "build/icons/liquea.icns",
       "target": ["dmg", "zip"]
     },
     "win": {
+      "icon": "build/icons/liquea.ico",
       "target": ["nsis", "portable"]
     },
     "linux": {
       "category": "Network",
+      "icon": "build/icons/liquea.png",
       "target": ["AppImage", "deb"]
     }
   }

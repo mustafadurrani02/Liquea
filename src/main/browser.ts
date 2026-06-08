@@ -27,7 +27,10 @@ interface BrowserTab {
 export class BrowserController {
   private readonly tabs = new Map<string, BrowserTab>()
   private readonly store = new BrowserStore()
+  private readonly closedTabs: Array<Pick<TabState, 'title' | 'url'>> = []
   private activeTabId: string | null = null
+  private chromeOverlayVisible = false
+  private focusMode = false
   private downloadItems = new Map<string, ElectronDownloadItem>()
 
   constructor(private readonly window: BrowserWindow) {
@@ -90,6 +93,8 @@ export class BrowserController {
 
     const ids = [...this.tabs.keys()]
     const index = ids.indexOf(id)
+    this.closedTabs.unshift({ title: tab.state.title, url: tab.state.url })
+    this.closedTabs.splice(12)
     this.window.contentView.removeChildView(tab.view)
     tab.view.webContents.close()
     this.tabs.delete(id)
@@ -110,12 +115,24 @@ export class BrowserController {
     if (!tab) return
     this.activeTabId = id
     for (const [tabId, candidate] of this.tabs) {
-      candidate.view.setVisible(tabId === id && !this.isInternal(candidate.state.url))
+      candidate.view.setVisible(
+        tabId === id && !this.isInternal(candidate.state.url) && !this.chromeOverlayVisible
+      )
     }
     this.window.contentView.addChildView(tab.view)
     this.layoutViews()
     tab.view.webContents.focus()
     this.emitSnapshot()
+  }
+
+  async duplicateTab(id: string): Promise<string> {
+    const tab = this.tabs.get(id)
+    return this.createTab(tab?.state.url ?? 'liquea://newtab')
+  }
+
+  async reopenClosedTab(): Promise<string | null> {
+    const tab = this.closedTabs.shift()
+    return tab ? this.createTab(tab.url) : null
   }
 
   async navigate(id: string, input: string): Promise<void> {
@@ -138,7 +155,7 @@ export class BrowserController {
     }
 
     tab.state.crashed = false
-    tab.view.setVisible(id === this.activeTabId)
+    tab.view.setVisible(id === this.activeTabId && !this.chromeOverlayVisible)
     try {
       await tab.view.webContents.loadURL(target)
     } catch {
@@ -235,6 +252,17 @@ export class BrowserController {
   showDownload(id: string): void {
     const download = this.store.downloads.find((item) => item.id === id)
     if (download?.path && existsSync(download.path)) shell.showItemInFolder(download.path)
+  }
+
+  setChromeOverlay(visible: boolean): void {
+    this.chromeOverlayVisible = visible
+    const activeTab = this.activeTabId ? this.tabs.get(this.activeTabId) : undefined
+    activeTab?.view.setVisible(!visible && !this.isInternal(activeTab.state.url))
+  }
+
+  setFocusMode(enabled: boolean): void {
+    this.focusMode = enabled
+    this.layoutViews()
   }
 
   showFind(): void {
@@ -352,9 +380,21 @@ export class BrowserController {
   private layoutViews(): void {
     const { width, height } = this.window.getContentBounds()
     const sidebar = this.store.settings.tabLayout === 'sidebar'
-    const bounds = sidebar
-      ? { x: 238, y: 78, width: Math.max(width - 250, 100), height: Math.max(height - 90, 100) }
-      : { x: 12, y: 132, width: Math.max(width - 24, 100), height: Math.max(height - 144, 100) }
+    const bounds = this.focusMode
+      ? { x: 12, y: 70, width: Math.max(width - 24, 100), height: Math.max(height - 82, 100) }
+      : sidebar
+        ? {
+            x: 238,
+            y: 78,
+            width: Math.max(width - 250, 100),
+            height: Math.max(height - 90, 100)
+          }
+        : {
+            x: 12,
+            y: 132,
+            width: Math.max(width - 24, 100),
+            height: Math.max(height - 144, 100)
+          }
 
     for (const tab of this.tabs.values()) {
       tab.view.setBounds(bounds)

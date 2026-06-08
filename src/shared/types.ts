@@ -75,6 +75,8 @@ export interface BrowserAPI {
   createTab: (url?: string) => Promise<string>
   closeTab: (tabId: string) => Promise<void>
   activateTab: (tabId: string) => Promise<void>
+  duplicateTab: (tabId: string) => Promise<string>
+  reopenClosedTab: () => Promise<string | null>
   navigate: (tabId: string, input: string) => Promise<void>
   goBack: (tabId: string) => Promise<void>
   goForward: (tabId: string) => Promise<void>
@@ -87,6 +89,8 @@ export interface BrowserAPI {
   updateSettings: (settings: Partial<BrowserSettings>) => Promise<void>
   clearBrowsingData: (options: ClearDataOptions) => Promise<void>
   showDownload: (downloadId: string) => Promise<void>
+  setChromeOverlay: (visible: boolean) => Promise<void>
+  setFocusMode: (enabled: boolean) => Promise<void>
   openExternal: (url: string) => Promise<void>
   onSnapshot: (callback: (snapshot: BrowserSnapshot) => void) => () => void
   onFind: (callback: () => void) => () => void

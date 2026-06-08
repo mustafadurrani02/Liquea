@@ -12,6 +12,8 @@ const api: BrowserAPI = {
   createTab: (url?: string) => ipcRenderer.invoke('browser:create-tab', url),
   closeTab: (id: string) => ipcRenderer.invoke('browser:close-tab', id),
   activateTab: (id: string) => ipcRenderer.invoke('browser:activate-tab', id),
+  duplicateTab: (id: string) => ipcRenderer.invoke('browser:duplicate-tab', id),
+  reopenClosedTab: () => ipcRenderer.invoke('browser:reopen-closed-tab'),
   navigate: (id: string, input: string) => ipcRenderer.invoke('browser:navigate', id, input),
   goBack: (id: string) => ipcRenderer.invoke('browser:back', id),
   goForward: (id: string) => ipcRenderer.invoke('browser:forward', id),
@@ -26,6 +28,8 @@ const api: BrowserAPI = {
   clearBrowsingData: (options: ClearDataOptions) =>
     ipcRenderer.invoke('browser:clear-data', options),
   showDownload: (id: string) => ipcRenderer.invoke('browser:show-download', id),
+  setChromeOverlay: (visible: boolean) => ipcRenderer.invoke('browser:set-chrome-overlay', visible),
+  setFocusMode: (enabled: boolean) => ipcRenderer.invoke('browser:set-focus-mode', enabled),
   openExternal: (url: string) => ipcRenderer.invoke('browser:open-external', url),
   onSnapshot: (callback: (snapshot: BrowserSnapshot) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, snapshot: BrowserSnapshot): void =>

@@ -38,6 +38,10 @@ Chromium fork and does not claim to implement a new rendering engine.
 - New tab, settings, history, bookmarks, downloads, and friendly error pages
 - Light, dark, and system themes with five accent colors
 - Three new-tab atmospheres and compact/comfortable tab density
+- Liquid Actions command palette for fast keyboard-first navigation
+- Visual tab overview, tab duplication, and reopen-closed-tab support
+- Focus mode that lets the active page take over the canvas
+- Ambient new-tab dashboard with time, recent journeys, saved places, and browser pulse
 - Do Not Track, conservative permission handling, popup-to-tab isolation, and clear-data controls
 - Native menu shortcuts and familiar keyboard navigation
 - macOS, Windows, and Linux packaging targets
@@ -140,6 +144,9 @@ copy the layout or controls of Safari, Chrome, Edge, Firefox, or Arc.
 | Settings | `Command+,` | `Ctrl+,` |
 | History | `Command+Y` | `Ctrl+Y` |
 | Toggle bookmark | `Command+Shift+B` | `Ctrl+Shift+B` |
+| Liquid Actions | `Command+K` | `Ctrl+K` |
+| Tab overview | `Command+\` | `Ctrl+\` |
+| Reopen closed tab | `Command+Shift+T` | `Ctrl+Shift+T` |
 | Back / forward | `Option+Left/Right` | `Alt+Left/Right` |
 
 ## LiquidOS

@@ -7,6 +7,8 @@ export function registerIpc(controller: BrowserController): void {
   ipcMain.handle('browser:create-tab', (_event, url?: string) => controller.createTab(url))
   ipcMain.handle('browser:close-tab', (_event, id: string) => controller.closeTab(id))
   ipcMain.handle('browser:activate-tab', (_event, id: string) => controller.activateTab(id))
+  ipcMain.handle('browser:duplicate-tab', (_event, id: string) => controller.duplicateTab(id))
+  ipcMain.handle('browser:reopen-closed-tab', () => controller.reopenClosedTab())
   ipcMain.handle('browser:navigate', (_event, id: string, input: string) =>
     controller.navigate(id, input)
   )
@@ -31,5 +33,11 @@ export function registerIpc(controller: BrowserController): void {
     controller.clearBrowsingData(options)
   )
   ipcMain.handle('browser:show-download', (_event, id: string) => controller.showDownload(id))
+  ipcMain.handle('browser:set-chrome-overlay', (_event, visible: boolean) =>
+    controller.setChromeOverlay(visible)
+  )
+  ipcMain.handle('browser:set-focus-mode', (_event, enabled: boolean) =>
+    controller.setFocusMode(enabled)
+  )
   ipcMain.handle('browser:open-external', (_event, url: string) => shell.openExternal(url))
 }

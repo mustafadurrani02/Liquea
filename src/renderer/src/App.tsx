@@ -1,25 +1,34 @@
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUpRight,
   BookOpen,
+  CalendarDays,
   Check,
   ChevronRight,
   Clock3,
+  Command,
+  Copy,
   Download,
   ExternalLink,
+  Focus,
   Globe2,
+  Grid2X2,
   Home,
   LoaderCircle,
+  Maximize2,
   MoreHorizontal,
   Palette,
   Plus,
   RefreshCw,
+  RotateCcw,
   Search,
   Settings,
   ShieldCheck,
   Sparkles,
   Star,
   Trash2,
+  Waves,
   X
 } from 'lucide-react'
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
@@ -52,6 +61,8 @@ export function App(): React.JSX.Element {
   const [snapshot, setSnapshot] = useState(EMPTY_SNAPSHOT)
   const [address, setAddress] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [overlay, setOverlay] = useState<'command' | 'tabs' | null>(null)
+  const [focusMode, setFocusMode] = useState(false)
   const addressRef = useRef<HTMLInputElement>(null)
   const activeTab = snapshot.tabs.find((tab) => tab.id === snapshot.activeTabId)
   const isSidebar = snapshot.settings.tabLayout === 'sidebar'
@@ -78,6 +89,21 @@ export function App(): React.JSX.Element {
         event.preventDefault()
         if (activeTab) void window.liquea.toggleBookmark(activeTab.id)
       }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setOverlay('command')
+      }
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 't') {
+        event.preventDefault()
+        void window.liquea.reopenClosedTab()
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key === '\\') {
+        event.preventDefault()
+        setOverlay('tabs')
+      }
+      if (event.key === 'Escape') {
+        setOverlay(null)
+      }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => {
@@ -91,6 +117,24 @@ export function App(): React.JSX.Element {
     document.documentElement.style.setProperty('--accent', snapshot.settings.accentColor)
   }, [snapshot.settings])
 
+  useEffect(() => {
+    void window.liquea.setChromeOverlay(Boolean(overlay))
+    return () => {
+      void window.liquea.setChromeOverlay(false)
+    }
+  }, [overlay])
+
+  useEffect(() => {
+    void window.liquea.setFocusMode(focusMode)
+  }, [focusMode])
+
+  const trackLight = (event: React.PointerEvent<HTMLElement>): void => {
+    const x = (event.clientX / window.innerWidth) * 100
+    const y = (event.clientY / window.innerHeight) * 100
+    event.currentTarget.style.setProperty('--pointer-x', `${x}%`)
+    event.currentTarget.style.setProperty('--pointer-y', `${y}%`)
+  }
+
   const navigate = (event: FormEvent): void => {
     event.preventDefault()
     if (activeTab) void window.liquea.navigate(activeTab.id, address)
@@ -102,16 +146,22 @@ export function App(): React.JSX.Element {
   )
 
   return (
-    <main className={`app-shell ${isSidebar ? 'sidebar-layout' : 'topbar-layout'}`}>
-      <div className="ambient ambient-one" />
-      <div className="ambient ambient-two" />
-      {isSidebar ? (
+    <main
+      className={`app-shell ${isSidebar ? 'sidebar-layout' : 'topbar-layout'} ${focusMode ? 'focus-mode' : ''}`}
+      onPointerMove={trackLight}
+    >
+      <div className="liquid-field" />
+      <div className="liquid-ribbon ribbon-one" />
+      <div className="liquid-ribbon ribbon-two" />
+      <div className="glass-grain" />
+      {!focusMode && (isSidebar ? (
         <SidebarTabs snapshot={snapshot} />
       ) : (
-        <TopTabs snapshot={snapshot} />
-      )}
+        <TopTabs snapshot={snapshot} onOverview={() => setOverlay('tabs')} />
+      ))}
 
-      <header className="navigation glass-panel">
+      <header className="navigation liquid-glass">
+        <div className="glass-reflection" />
         <div className="nav-controls">
           <IconButton
             label="Back"
@@ -159,6 +209,7 @@ export function App(): React.JSX.Element {
             aria-label="Address and search bar"
             spellCheck={false}
           />
+          <span className="address-hint"><Command /> K</span>
           <button
             type="button"
             className={`address-action ${isBookmarked ? 'active' : ''}`}
@@ -170,8 +221,17 @@ export function App(): React.JSX.Element {
         </form>
 
         <div className="nav-actions">
+          <IconButton label="Command palette" onClick={() => setOverlay('command')}>
+            <Command />
+          </IconButton>
           <IconButton label="Downloads" onClick={() => void window.liquea.openInternalPage('downloads')}>
             <Download />
+          </IconButton>
+          <IconButton
+            label={focusMode ? 'Leave focus mode' : 'Focus mode'}
+            onClick={() => setFocusMode((enabled) => !enabled)}
+          >
+            {focusMode ? <Maximize2 /> : <Focus />}
           </IconButton>
           <div className="menu-anchor">
             <IconButton label="Liquea menu" onClick={() => setMenuOpen((open) => !open)}>
@@ -188,15 +248,42 @@ export function App(): React.JSX.Element {
         )}
         {activeTab?.crashed && <ErrorPage tab={activeTab} />}
       </section>
+      {focusMode && (
+        <button className="focus-orb liquid-glass" onClick={() => setFocusMode(false)}>
+          <Waves />
+          <span>Leave focus</span>
+        </button>
+      )}
+      {overlay === 'command' && (
+        <CommandPalette
+          snapshot={snapshot}
+          activeTab={activeTab}
+          close={() => setOverlay(null)}
+          openTabs={() => setOverlay('tabs')}
+          toggleFocus={() => {
+            setFocusMode((enabled) => !enabled)
+            setOverlay(null)
+          }}
+        />
+      )}
+      {overlay === 'tabs' && (
+        <TabOverview snapshot={snapshot} close={() => setOverlay(null)} />
+      )}
     </main>
   )
 }
 
-function TopTabs({ snapshot }: { snapshot: BrowserSnapshot }): React.JSX.Element {
+function TopTabs({
+  snapshot,
+  onOverview
+}: {
+  snapshot: BrowserSnapshot
+  onOverview: () => void
+}): React.JSX.Element {
   return (
     <div className={`top-tabs ${snapshot.settings.tabStyle}`}>
       <div className="brand-mark" aria-label="Liquea">
-        <span>L</span>
+        <img src="./liquea-planet.png" alt="" />
       </div>
       <div className="tab-strip">
         {snapshot.tabs.map((tab) => (
@@ -206,6 +293,9 @@ function TopTabs({ snapshot }: { snapshot: BrowserSnapshot }): React.JSX.Element
       <IconButton label="New tab" onClick={() => void window.liquea.createTab()}>
         <Plus />
       </IconButton>
+      <IconButton label="Tab overview" onClick={onOverview}>
+        <Grid2X2 />
+      </IconButton>
     </div>
   )
 }
@@ -214,7 +304,7 @@ function SidebarTabs({ snapshot }: { snapshot: BrowserSnapshot }): React.JSX.Ele
   return (
     <aside className="sidebar glass-panel">
       <div className="sidebar-brand">
-        <div className="brand-mark"><span>L</span></div>
+        <div className="brand-mark"><img src="./liquea-planet.png" alt="" /></div>
         <strong>Liquea</strong>
         <IconButton label="New tab" onClick={() => void window.liquea.createTab()}>
           <Plus />
@@ -245,6 +335,7 @@ function Tab({ tab, active }: { tab: TabState; active: boolean }): React.JSX.Ele
     <div
       className={`tab ${active ? 'active' : ''}`}
       onClick={() => void window.liquea.activateTab(tab.id)}
+      onDoubleClick={() => void window.liquea.duplicateTab(tab.id)}
       role="button"
       tabIndex={0}
       onKeyDown={(event) => event.key === 'Enter' && void window.liquea.activateTab(tab.id)}
@@ -299,8 +390,205 @@ function BrowserMenu({ close }: { close: () => void }): React.JSX.Element {
           <ChevronRight />
         </button>
       ))}
+      <div className="menu-separator" />
+      <button
+        onClick={() => {
+          void window.liquea.reopenClosedTab()
+          close()
+        }}
+      >
+        <RotateCcw />
+        <span>Reopen closed tab</span>
+        <kbd>⇧⌘T</kbd>
+      </button>
     </div>
   )
+}
+
+function CommandPalette({
+  snapshot,
+  activeTab,
+  close,
+  openTabs,
+  toggleFocus
+}: {
+  snapshot: BrowserSnapshot
+  activeTab?: TabState
+  close: () => void
+  openTabs: () => void
+  toggleFocus: () => void
+}): React.JSX.Element {
+  const [query, setQuery] = useState('')
+  const actions = [
+    {
+      label: 'Open a new tab',
+      detail: 'Start a fresh journey',
+      icon: <Plus />,
+      run: () => void window.liquea.createTab()
+    },
+    {
+      label: 'Explore open tabs',
+      detail: `${snapshot.tabs.length} active ${snapshot.tabs.length === 1 ? 'space' : 'spaces'}`,
+      icon: <Grid2X2 />,
+      run: openTabs
+    },
+    {
+      label: 'Duplicate this tab',
+      detail: activeTab?.title ?? 'Current page',
+      icon: <Copy />,
+      run: () => activeTab && void window.liquea.duplicateTab(activeTab.id)
+    },
+    {
+      label: 'Reopen closed tab',
+      detail: 'Bring back your last space',
+      icon: <RotateCcw />,
+      run: () => void window.liquea.reopenClosedTab()
+    },
+    {
+      label: 'Enter focus mode',
+      detail: 'Let the page fill the canvas',
+      icon: <Focus />,
+      run: toggleFocus
+    },
+    {
+      label: 'Open bookmarks',
+      detail: `${snapshot.bookmarks.length} saved places`,
+      icon: <Star />,
+      run: () => void window.liquea.openInternalPage('bookmarks')
+    },
+    {
+      label: 'Open history',
+      detail: `${snapshot.history.length} recent journeys`,
+      icon: <Clock3 />,
+      run: () => void window.liquea.openInternalPage('history')
+    },
+    {
+      label: 'Personalize Liquea',
+      detail: 'Glass, color, layout and privacy',
+      icon: <Palette />,
+      run: () => void window.liquea.openInternalPage('settings')
+    }
+  ]
+  const filtered = actions.filter((action) =>
+    `${action.label} ${action.detail}`.toLowerCase().includes(query.toLowerCase())
+  )
+
+  return (
+    <div className="chrome-overlay" onMouseDown={close}>
+      <section className="command-palette liquid-glass" onMouseDown={(event) => event.stopPropagation()}>
+        <div className="palette-glow" />
+        <img className="palette-planet" src="./liquea-planet.png" alt="" />
+        <header>
+          <div className="palette-search">
+            <Search />
+            <input
+              autoFocus
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="What would you like to do?"
+            />
+            <kbd>esc</kbd>
+          </div>
+        </header>
+        <div className="palette-label">Liquid actions</div>
+        <div className="palette-actions">
+          {filtered.map((action, index) => (
+            <button
+              key={action.label}
+              className={index === 0 ? 'suggested' : ''}
+              onClick={() => {
+                action.run()
+                if (action.run !== openTabs && action.run !== toggleFocus) close()
+              }}
+            >
+              <span className="action-icon">{action.icon}</span>
+              <span><strong>{action.label}</strong><small>{action.detail}</small></span>
+              <ArrowUpRight />
+            </button>
+          ))}
+        </div>
+        <footer><Command /> <span>Search commands, tabs and places</span></footer>
+      </section>
+    </div>
+  )
+}
+
+function TabOverview({
+  snapshot,
+  close
+}: {
+  snapshot: BrowserSnapshot
+  close: () => void
+}): React.JSX.Element {
+  return (
+    <div className="chrome-overlay tab-overview-shell" onMouseDown={close}>
+      <section className="tab-overview" onMouseDown={(event) => event.stopPropagation()}>
+        <header>
+          <div>
+            <p className="eyebrow">Your liquid workspace</p>
+            <h2>Open spaces</h2>
+          </div>
+          <div className="overview-actions">
+            <span>{snapshot.tabs.length} {snapshot.tabs.length === 1 ? 'tab' : 'tabs'}</span>
+            <IconButton label="Close overview" onClick={close}><X /></IconButton>
+          </div>
+        </header>
+        <div className="tab-cards">
+          {snapshot.tabs.map((tab, index) => (
+            <article
+              key={tab.id}
+              className={`tab-card liquid-glass ${tab.id === snapshot.activeTabId ? 'active' : ''}`}
+            >
+              <button
+                className="tab-card-main"
+                onClick={() => {
+                  void window.liquea.activateTab(tab.id)
+                  close()
+                }}
+              >
+                <div className="tab-card-visual">
+                  <span className="tab-number">{String(index + 1).padStart(2, '0')}</span>
+                  {tab.favicon ? <img src={tab.favicon} alt="" /> : <Waves />}
+                  <div className="mini-orb" />
+                </div>
+                <div className="tab-card-copy">
+                  <strong>{tab.title}</strong>
+                  <small>{friendlyHost(tab.url)}</small>
+                </div>
+              </button>
+              <div className="tab-card-actions">
+                <IconButton label={`Duplicate ${tab.title}`} onClick={() => void window.liquea.duplicateTab(tab.id)}>
+                  <Copy />
+                </IconButton>
+                <IconButton label={`Close ${tab.title}`} onClick={() => void window.liquea.closeTab(tab.id)}>
+                  <X />
+                </IconButton>
+              </div>
+            </article>
+          ))}
+          <button
+            className="new-space-card liquid-glass"
+            onClick={() => {
+              void window.liquea.createTab()
+              close()
+            }}
+          >
+            <Plus />
+            <span>New space</span>
+          </button>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function friendlyHost(url: string): string {
+  if (url.startsWith('liquea://')) return url.replace('liquea://', 'Liquea · ')
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return url
+  }
 }
 
 function InternalPage({
@@ -327,52 +615,82 @@ function NewTab({
   activeTab: TabState
 }): React.JSX.Element {
   const [query, setQuery] = useState('')
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours()
-    return hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000)
+    return () => window.clearInterval(timer)
   }, [])
+  const greeting = useMemo(() => {
+    const hour = now.getHours()
+    return hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+  }, [now])
   const navigate = (event: FormEvent): void => {
     event.preventDefault()
     void window.liquea.navigate(activeTab.id, query)
   }
   return (
     <div className={`internal-page new-tab background-${snapshot.settings.newTabBackground}`}>
-      <div className="orb orb-one" />
-      <div className="orb orb-two" />
+      <div className="new-tab-liquid liquid-a" />
+      <div className="new-tab-liquid liquid-b" />
+      <div className="new-tab-liquid liquid-c" />
       <div className="new-tab-content">
-        <div className="new-tab-logo"><span>L</span></div>
-        <p className="eyebrow">{greeting}</p>
-        <h1>Where will curiosity take you?</h1>
-        <form className="new-tab-search glass-panel" onSubmit={navigate}>
-          <Search />
+        <header className="new-tab-heading">
+          <div>
+            <p className="eyebrow">{greeting}</p>
+            <h1>Move through the web<br /><em>like light through glass.</em></h1>
+          </div>
+          <div className="time-capsule liquid-glass">
+            <strong>{now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong>
+            <span><CalendarDays /> {now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}</span>
+          </div>
+        </header>
+        <form className="new-tab-search liquid-glass" onSubmit={navigate}>
+          <span className="search-lens"><Search /></span>
           <input
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search the web"
           />
-          <span>Google</span>
+          <span className="search-engine">Search with {snapshot.settings.searchEngine}</span>
+          <kbd>↵</kbd>
         </form>
-        <div className="quick-links">
-          {snapshot.bookmarks.slice(0, 6).map((bookmark) => (
-            <button
-              key={bookmark.id}
-              className="quick-link glass-panel"
-              onClick={() => void window.liquea.navigate(activeTab.id, bookmark.url)}
-            >
-              <Globe2 />
-              <span>{bookmark.title}</span>
-            </button>
-          ))}
-          <button
-            className="quick-link glass-panel"
-            onClick={() => void window.liquea.openInternalPage('bookmarks')}
-          >
-            <Plus />
-            <span>{snapshot.bookmarks.length ? 'All bookmarks' : 'Add a bookmark'}</span>
-          </button>
+        <div className="launch-grid">
+          <section className="journey-panel liquid-glass">
+            <header><span><Clock3 /> Recent currents</span><button onClick={() => void window.liquea.openInternalPage('history')}>See all</button></header>
+            <div className="journey-list">
+              {snapshot.history.slice(0, 3).map((entry, index) => (
+                <button key={entry.id} onClick={() => void window.liquea.navigate(activeTab.id, entry.url)}>
+                  <span className="journey-index">0{index + 1}</span>
+                  <span><strong>{entry.title}</strong><small>{friendlyHost(entry.url)}</small></span>
+                  <ArrowUpRight />
+                </button>
+              ))}
+              {!snapshot.history.length && <p>Your recent journeys will gather here.</p>}
+            </div>
+          </section>
+          <section className="places-panel">
+            {(snapshot.bookmarks.length ? snapshot.bookmarks.slice(0, 4) : [
+              { id: 'google', title: 'Google', url: 'https://google.com' },
+              { id: 'github', title: 'GitHub', url: 'https://github.com' }
+            ]).map((bookmark, index) => (
+              <button
+                key={bookmark.id}
+                className="place-orb liquid-glass"
+                onClick={() => void window.liquea.navigate(activeTab.id, bookmark.url)}
+              >
+                <span>{bookmark.title.slice(0, 1).toUpperCase()}</span>
+                <strong>{bookmark.title}</strong>
+                <small>0{index + 1}</small>
+              </button>
+            ))}
+          </section>
+          <aside className="pulse-panel liquid-glass">
+            <div className="pulse-ring"><Waves /><span /></div>
+            <div><p className="eyebrow">Liquea pulse</p><strong>{snapshot.tabs.length} {snapshot.tabs.length === 1 ? 'space' : 'spaces'} flowing</strong><small>{snapshot.bookmarks.length} places saved · Privacy active</small></div>
+          </aside>
         </div>
-        <p className="privacy-note"><ShieldCheck /> Protected by Liquea privacy controls</p>
+        <p className="privacy-note"><ShieldCheck /> Your browsing stays on this device <span>·</span> <Command /> K for Liquid Actions</p>
       </div>
     </div>
   )

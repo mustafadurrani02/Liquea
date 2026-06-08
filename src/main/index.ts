@@ -1,4 +1,4 @@
-import { BrowserWindow, Menu, app, nativeTheme } from 'electron'
+import { BrowserWindow, Menu, app, nativeImage, nativeTheme } from 'electron'
 import { join } from 'node:path'
 import { BrowserController } from './browser'
 import { registerIpc } from './ipc'
@@ -7,12 +7,15 @@ let mainWindow: BrowserWindow | null = null
 let controller: BrowserController | null = null
 
 function createWindow(): void {
+  const iconPath = join(__dirname, '../renderer/liquea-planet.png')
+  const icon = nativeImage.createFromPath(iconPath)
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 920,
     minWidth: 960,
     minHeight: 640,
     title: 'Liquea',
+    icon,
     backgroundColor: '#0b0c11',
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 20, y: 18 },
@@ -25,6 +28,10 @@ function createWindow(): void {
       nodeIntegration: false
     }
   })
+
+  if (process.platform === 'darwin' && app.dock && !icon.isEmpty()) {
+    app.dock.setIcon(icon)
+  }
 
   controller = new BrowserController(mainWindow)
   registerIpc(controller)
