@@ -55,8 +55,8 @@ Requirements:
 - macOS, Windows 10+, or a modern Linux desktop
 
 ```bash
-git clone https://github.com/mustafadurrani02/Liquea.git
-cd Liquea
+git clone https://github.com/mustafadurrani02/Liqueia.git
+cd Liqueia
 npm install
 npm run dev
 ```
