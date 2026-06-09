@@ -66,7 +66,7 @@ svg { width: 18px; height: 18px; stroke-width: 1.8; }
   background: var(--surface);
   box-shadow: var(--shadow);
 }
-.startup-error h1 { margin: 0 0 12px; font: 500 32px Georgia, serif; }
+.startup-error h1 { margin: 0 0 12px; font: 500 32px inherit; }
 .startup-error p { margin: 0; color: var(--muted); line-height: 1.6; }
 
 .app-shell {
@@ -108,7 +108,7 @@ svg { width: 18px; height: 18px; stroke-width: 1.8; }
   display: grid; place-items: center;
   background: linear-gradient(145deg, #f4d89d, var(--accent) 55%, #7d5a24);
   color: #1d160c; box-shadow: inset 0 1px 1px rgba(255,255,255,.7), 0 8px 28px color-mix(in srgb, var(--accent) 28%, transparent);
-  font-family: Georgia, serif; font-weight: 800; font-size: 21px;
+  font-family: inherit; font-weight: 800; font-size: 21px;
 }
 .tab-strip { display: flex; flex: 1; min-width: 0; gap: 5px; overflow: hidden; }
 .tab {
@@ -174,7 +174,7 @@ svg { width: 18px; height: 18px; stroke-width: 1.8; }
 .sidebar button, .sidebar .tab { -webkit-app-region: no-drag; }
 .sidebar-brand { height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 4px; margin-bottom: 14px; }
 .sidebar-brand .brand-mark { width: 34px; height: 34px; border-radius: 12px; }
-.sidebar-brand strong { flex: 1; font-family: Georgia, serif; font-size: 18px; letter-spacing: -.3px; }
+.sidebar-brand strong { flex: 1; font-family: inherit; font-size: 18px; letter-spacing: -.3px; }
 .sidebar-tabs { display: flex; flex-direction: column; gap: 4px; flex: 1; min-height: 0; overflow: auto; }
 .sidebar .tab { width: 100%; max-width: none; min-height: 40px; flex: 0 0 40px; }
 .sidebar-quick { border-top: 1px solid var(--line); padding-top: 10px; }
@@ -210,9 +210,9 @@ svg { width: 18px; height: 18px; stroke-width: 1.8; }
 .orb-two { width: 420px; height: 420px; bottom: -250px; left: -60px; background: radial-gradient(circle, rgba(117,96,220,.5), transparent 70%); filter: blur(45px); }
 .new-tab::after { content: ""; position: absolute; inset: 0; opacity: .16; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E"); }
 .new-tab-content { position: relative; z-index: 2; width: min(760px, 86%); text-align: center; margin-top: -5vh; }
-.new-tab-logo { width: 66px; height: 66px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 24px; color: #2b1c08; font: 800 38px Georgia, serif; background: linear-gradient(145deg, #fff0c9, var(--accent) 58%, #7f5a20); box-shadow: inset 0 2px 2px rgba(255,255,255,.7), 0 18px 50px color-mix(in srgb, var(--accent) 24%, transparent); }
+.new-tab-logo { width: 66px; height: 66px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 24px; color: #2b1c08; font: 800 38px inherit; background: linear-gradient(145deg, #fff0c9, var(--accent) 58%, #7f5a20); box-shadow: inset 0 2px 2px rgba(255,255,255,.7), 0 18px 50px color-mix(in srgb, var(--accent) 24%, transparent); }
 .eyebrow { margin: 0 0 8px; color: var(--accent); text-transform: uppercase; letter-spacing: 2.1px; font-size: 10px; font-weight: 750; }
-.new-tab h1, .page-header h1, .error-card h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 500; letter-spacing: -1.6px; }
+.new-tab h1, .page-header h1, .error-card h1 { font-family: inherit; font-weight: 500; letter-spacing: -1.6px; }
 .new-tab h1 { margin: 0 0 30px; font-size: clamp(34px, 4vw, 52px); }
 .new-tab-search { height: 58px; border-radius: 21px; display: flex; align-items: center; padding: 0 18px; width: min(650px, 100%); margin: auto; }
 .new-tab-search svg { color: var(--accent); }
@@ -291,7 +291,7 @@ select, .setting-input { min-width: 180px; border: 1px solid var(--line); border
   .tab { max-width: 180px; }
 }
 
-/* Liquea Liquid Glass 2.0 */
+/* Liqueia Liquid Glass 2.0 */
 :root {
   --pointer-x: 50%;
   --pointer-y: 30%;
@@ -456,7 +456,7 @@ kbd { color: var(--muted); background: rgba(255,255,255,.06); border: 1px solid 
 .tab-overview-shell { place-items: center; padding-top: 70px; }
 .tab-overview { width: min(1100px, 92vw); max-height: 82vh; }
 .tab-overview > header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 22px; }
-.tab-overview h2 { margin: 0; font: 500 38px Georgia, serif; }
+.tab-overview h2 { margin: 0; font: 500 38px inherit; }
 .overview-actions { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 10px; }
 .tab-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-height: 66vh; overflow: auto; padding: 2px; }
 .tab-card, .new-space-card { min-height: 210px; border-radius: 27px 34px 26px 32px; overflow: hidden; }
@@ -491,7 +491,7 @@ kbd { color: var(--muted); background: rgba(255,255,255,.06); border: 1px solid 
 .new-tab h1 { font-size: clamp(37px, 4.2vw, 62px); line-height: .99; margin: 0; letter-spacing: -2.5px; }
 .new-tab h1 em { color: color-mix(in srgb, var(--accent) 80%, white); font-weight: 400; }
 .time-capsule { width: 188px; min-height: 96px; border-radius: 27px 34px 26px 32px; padding: 17px 19px; display: flex; flex-direction: column; justify-content: center; flex: 0 0 auto; }
-.time-capsule strong { font: 500 28px Georgia, serif; }
+.time-capsule strong { font: 500 28px inherit; }
 .time-capsule span { display: flex; align-items: center; gap: 6px; color: var(--muted); margin-top: 7px; font-size: 9px; }
 .time-capsule svg { width: 12px; }
 .new-tab-search { position: relative; width: 100%; max-width: none; height: 66px; border-radius: 24px 31px 23px 29px; margin: 0 0 18px; padding: 0 15px; }
@@ -518,7 +518,7 @@ kbd { color: var(--muted); background: rgba(255,255,255,.06); border: 1px solid 
 .places-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .place-orb { min-height: 98px; border-radius: 23px 30px 22px 28px; display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 8px; padding: 12px; text-align: left; overflow: hidden; }
 .place-orb:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 34%, var(--line)); }
-.place-orb > span { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 13px 17px 12px 16px; background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); font: 600 16px Georgia, serif; }
+.place-orb > span { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 13px 17px 12px 16px; background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); font: 600 16px inherit; }
 .place-orb strong { overflow: hidden; text-overflow: ellipsis; font-size: 10px; }
 .place-orb small { color: var(--muted); font: 8px ui-monospace, monospace; align-self: start; }
 .pulse-panel { display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
@@ -541,4 +541,138 @@ kbd { color: var(--muted); background: rgba(255,255,255,.06); border: 1px solid 
   .pulse-panel { display: none; }
   .tab-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .new-tab-content { width: calc(100% - 44px); }
+}
+
+/* Liqueia consistency pass */
+:root {
+  --radius: 18px;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+.startup-error h1,
+.sidebar-brand strong,
+.new-tab h1,
+.page-header h1,
+.error-card h1,
+.tab-overview h2,
+.time-capsule strong,
+.place-orb > span {
+  font-family: inherit;
+}
+
+:where(
+  .startup-error section,
+  .glass-panel,
+  .liquid-glass,
+  .tab,
+  .tab-close,
+  .navigation,
+  .icon-button,
+  .address-action,
+  .address-bar,
+  .address-hint,
+  .content-frame,
+  .sidebar,
+  .sidebar-quick button,
+  .browser-menu,
+  .browser-menu button,
+  .quick-link,
+  .page-icon,
+  .settings-section,
+  .section-icon,
+  .segmented,
+  .segmented button,
+  select,
+  .setting-input,
+  .danger-button,
+  .primary-button,
+  .item-list,
+  .empty-state,
+  .list-icon,
+  .error-card,
+  .focus-orb,
+  .command-palette,
+  .palette-search,
+  kbd,
+  .palette-actions button,
+  .action-icon,
+  .tab-card,
+  .new-space-card,
+  .tab-card-visual,
+  .time-capsule,
+  .new-tab-search,
+  .search-lens,
+  .journey-panel,
+  .pulse-panel,
+  .journey-list > button,
+  .place-orb
+) {
+  border-radius: var(--radius);
+}
+
+.new-tab {
+  display: grid;
+  place-items: center;
+}
+
+.new-tab-content {
+  width: min(720px, calc(100% - 56px));
+  padding: 0;
+  margin: -5vh auto 0;
+  text-align: center;
+}
+
+.new-tab-planet {
+  width: 112px;
+  height: 112px;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 36px color-mix(in srgb, var(--accent) 25%, transparent));
+}
+
+.new-tab h1 {
+  margin: 8px 0 28px;
+  font-size: clamp(34px, 4vw, 48px);
+  font-weight: 650;
+  letter-spacing: -.045em;
+}
+
+.new-tab-search {
+  height: 64px;
+  margin: 0;
+}
+
+.new-tab-search input {
+  font-size: 15px;
+  text-align: left;
+}
+
+.is-macos::before {
+  content: "";
+  position: absolute;
+  z-index: 24;
+  top: 8px;
+  left: 10px;
+  width: 76px;
+  height: 38px;
+  pointer-events: none;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, .13);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .035)),
+    rgba(18, 19, 26, .66);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, .2),
+    0 10px 28px rgba(0, 0, 0, .25);
+  backdrop-filter: blur(28px) saturate(160%);
+}
+
+.is-macos .top-tabs {
+  padding-left: 98px;
 }

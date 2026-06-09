@@ -1,4 +1,4 @@
-# Liquea Roadmap
+# Liqueia Roadmap
 
 ## 0.2 - Daily Browsing Foundations
 

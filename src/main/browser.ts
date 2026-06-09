@@ -42,7 +42,7 @@ export class BrowserController {
   }
 
   async initialize(): Promise<void> {
-    await this.createTab('liquea://newtab')
+    await this.createTab('liqueia://newtab')
   }
 
   snapshot(): BrowserSnapshot {
@@ -56,7 +56,7 @@ export class BrowserController {
     }
   }
 
-  async createTab(url = 'liquea://newtab'): Promise<string> {
+  async createTab(url = 'liqueia://newtab'): Promise<string> {
     const id = randomUUID()
     const view = new WebContentsView({
       webPreferences: {
@@ -71,7 +71,7 @@ export class BrowserController {
       state: {
         id,
         title: 'New Tab',
-        url: 'liquea://newtab',
+        url: 'liqueia://newtab',
         loading: false,
         canGoBack: false,
         canGoForward: false,
@@ -127,7 +127,7 @@ export class BrowserController {
 
   async duplicateTab(id: string): Promise<string> {
     const tab = this.tabs.get(id)
-    return this.createTab(tab?.state.url ?? 'liquea://newtab')
+    return this.createTab(tab?.state.url ?? 'liqueia://newtab')
   }
 
   async reopenClosedTab(): Promise<string | null> {
@@ -202,7 +202,7 @@ export class BrowserController {
   }
 
   async openInternalPage(page: InternalPage): Promise<void> {
-    if (this.activeTabId) await this.navigate(this.activeTabId, `liquea://${page}`)
+    if (this.activeTabId) await this.navigate(this.activeTabId, `liqueia://${page}`)
   }
 
   toggleBookmark(id: string): void {
@@ -413,7 +413,7 @@ export class BrowserController {
   }
 
   private internalTitle(url: string): string {
-    const page = url.replace('liquea://', '')
+    const page = url.replace('liqueia://', '')
     return page === 'newtab' ? 'New Tab' : `${page[0].toUpperCase()}${page.slice(1)}`
   }
 }

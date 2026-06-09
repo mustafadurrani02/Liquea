@@ -3,7 +3,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
-  CalendarDays,
   Check,
   ChevronRight,
   Clock3,
@@ -31,7 +30,7 @@ import {
   Waves,
   X
 } from 'lucide-react'
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import {
   DEFAULT_SETTINGS,
   type BrowserSettings,
@@ -50,11 +49,11 @@ const EMPTY_SNAPSHOT: BrowserSnapshot = {
 }
 
 const internalPages: Record<string, InternalPage> = {
-  'liquea://settings': 'settings',
-  'liquea://history': 'history',
-  'liquea://bookmarks': 'bookmarks',
-  'liquea://downloads': 'downloads',
-  'liquea://newtab': 'newtab'
+  'liqueia://settings': 'settings',
+  'liqueia://history': 'history',
+  'liqueia://bookmarks': 'bookmarks',
+  'liqueia://downloads': 'downloads',
+  'liqueia://newtab': 'newtab'
 }
 
 export function App(): React.JSX.Element {
@@ -66,20 +65,21 @@ export function App(): React.JSX.Element {
   const addressRef = useRef<HTMLInputElement>(null)
   const activeTab = snapshot.tabs.find((tab) => tab.id === snapshot.activeTabId)
   const isSidebar = snapshot.settings.tabLayout === 'sidebar'
+  const isMacOS = navigator.userAgent.includes('Mac')
 
   useEffect(() => {
-    void window.liquea.getSnapshot().then(setSnapshot)
-    return window.liquea.onSnapshot(setSnapshot)
+    void window.liqueia.getSnapshot().then(setSnapshot)
+    return window.liqueia.onSnapshot(setSnapshot)
   }, [])
 
   useEffect(() => {
     // Navigation is external state; mirror it unless the tab is an internal page.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAddress(activeTab?.url.startsWith('liquea://') ? '' : (activeTab?.url ?? ''))
+    setAddress(activeTab?.url.startsWith('liqueia://') ? '' : (activeTab?.url ?? ''))
   }, [activeTab?.id, activeTab?.url])
 
   useEffect(() => {
-    const offFind = window.liquea.onFind(() => addressRef.current?.select())
+    const offFind = window.liqueia.onFind(() => addressRef.current?.select())
     const onKeyDown = (event: KeyboardEvent): void => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'l') {
         event.preventDefault()
@@ -87,7 +87,7 @@ export function App(): React.JSX.Element {
       }
       if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'b') {
         event.preventDefault()
-        if (activeTab) void window.liquea.toggleBookmark(activeTab.id)
+        if (activeTab) void window.liqueia.toggleBookmark(activeTab.id)
       }
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
@@ -95,7 +95,7 @@ export function App(): React.JSX.Element {
       }
       if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 't') {
         event.preventDefault()
-        void window.liquea.reopenClosedTab()
+        void window.liqueia.reopenClosedTab()
       }
       if ((event.metaKey || event.ctrlKey) && event.key === '\\') {
         event.preventDefault()
@@ -118,14 +118,14 @@ export function App(): React.JSX.Element {
   }, [snapshot.settings])
 
   useEffect(() => {
-    void window.liquea.setChromeOverlay(Boolean(overlay))
+    void window.liqueia.setChromeOverlay(Boolean(overlay))
     return () => {
-      void window.liquea.setChromeOverlay(false)
+      void window.liqueia.setChromeOverlay(false)
     }
   }, [overlay])
 
   useEffect(() => {
-    void window.liquea.setFocusMode(focusMode)
+    void window.liqueia.setFocusMode(focusMode)
   }, [focusMode])
 
   const trackLight = (event: React.PointerEvent<HTMLElement>): void => {
@@ -137,7 +137,7 @@ export function App(): React.JSX.Element {
 
   const navigate = (event: FormEvent): void => {
     event.preventDefault()
-    if (activeTab) void window.liquea.navigate(activeTab.id, address)
+    if (activeTab) void window.liqueia.navigate(activeTab.id, address)
     addressRef.current?.blur()
   }
 
@@ -147,7 +147,7 @@ export function App(): React.JSX.Element {
 
   return (
     <main
-      className={`app-shell ${isSidebar ? 'sidebar-layout' : 'topbar-layout'} ${focusMode ? 'focus-mode' : ''}`}
+      className={`app-shell ${isSidebar ? 'sidebar-layout' : 'topbar-layout'} ${focusMode ? 'focus-mode' : ''} ${isMacOS ? 'is-macos' : ''}`}
       onPointerMove={trackLight}
     >
       <div className="liquid-field" />
@@ -166,14 +166,14 @@ export function App(): React.JSX.Element {
           <IconButton
             label="Back"
             disabled={!activeTab?.canGoBack}
-            onClick={() => activeTab && void window.liquea.goBack(activeTab.id)}
+            onClick={() => activeTab && void window.liqueia.goBack(activeTab.id)}
           >
             <ArrowLeft />
           </IconButton>
           <IconButton
             label="Forward"
             disabled={!activeTab?.canGoForward}
-            onClick={() => activeTab && void window.liquea.goForward(activeTab.id)}
+            onClick={() => activeTab && void window.liqueia.goForward(activeTab.id)}
           >
             <ArrowRight />
           </IconButton>
@@ -182,15 +182,15 @@ export function App(): React.JSX.Element {
             onClick={() =>
               activeTab &&
               void (activeTab.loading
-                ? window.liquea.stop(activeTab.id)
-                : window.liquea.reload(activeTab.id))
+                ? window.liqueia.stop(activeTab.id)
+                : window.liqueia.reload(activeTab.id))
             }
           >
             {activeTab?.loading ? <X /> : <RefreshCw />}
           </IconButton>
           <IconButton
             label="Home"
-            onClick={() => activeTab && void window.liquea.goHome(activeTab.id)}
+            onClick={() => activeTab && void window.liqueia.goHome(activeTab.id)}
           >
             <Home />
           </IconButton>
@@ -214,7 +214,7 @@ export function App(): React.JSX.Element {
             type="button"
             className={`address-action ${isBookmarked ? 'active' : ''}`}
             aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-            onClick={() => activeTab && void window.liquea.toggleBookmark(activeTab.id)}
+            onClick={() => activeTab && void window.liqueia.toggleBookmark(activeTab.id)}
           >
             <Star fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
@@ -224,7 +224,7 @@ export function App(): React.JSX.Element {
           <IconButton label="Command palette" onClick={() => setOverlay('command')}>
             <Command />
           </IconButton>
-          <IconButton label="Downloads" onClick={() => void window.liquea.openInternalPage('downloads')}>
+          <IconButton label="Downloads" onClick={() => void window.liqueia.openInternalPage('downloads')}>
             <Download />
           </IconButton>
           <IconButton
@@ -234,7 +234,7 @@ export function App(): React.JSX.Element {
             {focusMode ? <Maximize2 /> : <Focus />}
           </IconButton>
           <div className="menu-anchor">
-            <IconButton label="Liquea menu" onClick={() => setMenuOpen((open) => !open)}>
+            <IconButton label="Liqueia menu" onClick={() => setMenuOpen((open) => !open)}>
               <MoreHorizontal />
             </IconButton>
             {menuOpen && <BrowserMenu close={() => setMenuOpen(false)} />}
@@ -282,15 +282,15 @@ function TopTabs({
 }): React.JSX.Element {
   return (
     <div className={`top-tabs ${snapshot.settings.tabStyle}`}>
-      <div className="brand-mark" aria-label="Liquea">
-        <img src="./liquea-planet.png" alt="" />
+      <div className="brand-mark" aria-label="Liqueia">
+        <img src="./liqueia-planet.png" alt="" />
       </div>
       <div className="tab-strip">
         {snapshot.tabs.map((tab) => (
           <Tab key={tab.id} tab={tab} active={tab.id === snapshot.activeTabId} />
         ))}
       </div>
-      <IconButton label="New tab" onClick={() => void window.liquea.createTab()}>
+      <IconButton label="New tab" onClick={() => void window.liqueia.createTab()}>
         <Plus />
       </IconButton>
       <IconButton label="Tab overview" onClick={onOverview}>
@@ -304,9 +304,9 @@ function SidebarTabs({ snapshot }: { snapshot: BrowserSnapshot }): React.JSX.Ele
   return (
     <aside className="sidebar glass-panel">
       <div className="sidebar-brand">
-        <div className="brand-mark"><img src="./liquea-planet.png" alt="" /></div>
-        <strong>Liquea</strong>
-        <IconButton label="New tab" onClick={() => void window.liquea.createTab()}>
+        <div className="brand-mark"><img src="./liqueia-planet.png" alt="" /></div>
+        <strong>Liqueia</strong>
+        <IconButton label="New tab" onClick={() => void window.liqueia.createTab()}>
           <Plus />
         </IconButton>
       </div>
@@ -316,13 +316,13 @@ function SidebarTabs({ snapshot }: { snapshot: BrowserSnapshot }): React.JSX.Ele
         ))}
       </div>
       <div className="sidebar-quick">
-        <button onClick={() => void window.liquea.openInternalPage('bookmarks')}>
+        <button onClick={() => void window.liqueia.openInternalPage('bookmarks')}>
           <Star /> Bookmarks
         </button>
-        <button onClick={() => void window.liquea.openInternalPage('history')}>
+        <button onClick={() => void window.liqueia.openInternalPage('history')}>
           <Clock3 /> History
         </button>
-        <button onClick={() => void window.liquea.openInternalPage('settings')}>
+        <button onClick={() => void window.liqueia.openInternalPage('settings')}>
           <Settings /> Settings
         </button>
       </div>
@@ -334,11 +334,11 @@ function Tab({ tab, active }: { tab: TabState; active: boolean }): React.JSX.Ele
   return (
     <div
       className={`tab ${active ? 'active' : ''}`}
-      onClick={() => void window.liquea.activateTab(tab.id)}
-      onDoubleClick={() => void window.liquea.duplicateTab(tab.id)}
+      onClick={() => void window.liqueia.activateTab(tab.id)}
+      onDoubleClick={() => void window.liqueia.duplicateTab(tab.id)}
       role="button"
       tabIndex={0}
-      onKeyDown={(event) => event.key === 'Enter' && void window.liquea.activateTab(tab.id)}
+      onKeyDown={(event) => event.key === 'Enter' && void window.liqueia.activateTab(tab.id)}
     >
       <span className="tab-favicon">
         {tab.loading ? (
@@ -355,7 +355,7 @@ function Tab({ tab, active }: { tab: TabState; active: boolean }): React.JSX.Ele
         aria-label={`Close ${tab.title}`}
         onClick={(event) => {
           event.stopPropagation()
-          void window.liquea.closeTab(tab.id)
+          void window.liqueia.closeTab(tab.id)
         }}
       >
         <X />
@@ -374,14 +374,14 @@ function BrowserMenu({ close }: { close: () => void }): React.JSX.Element {
   ]
   return (
     <div className="browser-menu glass-panel">
-      <div className="menu-heading">Liquea</div>
+      <div className="menu-heading">Liqueia</div>
       {items.map(([page, icon, label]) => (
         <button
           key={page}
           onClick={() => {
             void (page === 'newtab'
-              ? window.liquea.createTab()
-              : window.liquea.openInternalPage(page))
+              ? window.liqueia.createTab()
+              : window.liqueia.openInternalPage(page))
             close()
           }}
         >
@@ -393,7 +393,7 @@ function BrowserMenu({ close }: { close: () => void }): React.JSX.Element {
       <div className="menu-separator" />
       <button
         onClick={() => {
-          void window.liquea.reopenClosedTab()
+          void window.liqueia.reopenClosedTab()
           close()
         }}
       >
@@ -424,7 +424,7 @@ function CommandPalette({
       label: 'Open a new tab',
       detail: 'Start a fresh journey',
       icon: <Plus />,
-      run: () => void window.liquea.createTab()
+      run: () => void window.liqueia.createTab()
     },
     {
       label: 'Explore open tabs',
@@ -436,13 +436,13 @@ function CommandPalette({
       label: 'Duplicate this tab',
       detail: activeTab?.title ?? 'Current page',
       icon: <Copy />,
-      run: () => activeTab && void window.liquea.duplicateTab(activeTab.id)
+      run: () => activeTab && void window.liqueia.duplicateTab(activeTab.id)
     },
     {
       label: 'Reopen closed tab',
       detail: 'Bring back your last space',
       icon: <RotateCcw />,
-      run: () => void window.liquea.reopenClosedTab()
+      run: () => void window.liqueia.reopenClosedTab()
     },
     {
       label: 'Enter focus mode',
@@ -454,19 +454,19 @@ function CommandPalette({
       label: 'Open bookmarks',
       detail: `${snapshot.bookmarks.length} saved places`,
       icon: <Star />,
-      run: () => void window.liquea.openInternalPage('bookmarks')
+      run: () => void window.liqueia.openInternalPage('bookmarks')
     },
     {
       label: 'Open history',
       detail: `${snapshot.history.length} recent journeys`,
       icon: <Clock3 />,
-      run: () => void window.liquea.openInternalPage('history')
+      run: () => void window.liqueia.openInternalPage('history')
     },
     {
-      label: 'Personalize Liquea',
+      label: 'Personalize Liqueia',
       detail: 'Glass, color, layout and privacy',
       icon: <Palette />,
-      run: () => void window.liquea.openInternalPage('settings')
+      run: () => void window.liqueia.openInternalPage('settings')
     }
   ]
   const filtered = actions.filter((action) =>
@@ -477,7 +477,7 @@ function CommandPalette({
     <div className="chrome-overlay" onMouseDown={close}>
       <section className="command-palette liquid-glass" onMouseDown={(event) => event.stopPropagation()}>
         <div className="palette-glow" />
-        <img className="palette-planet" src="./liquea-planet.png" alt="" />
+        <img className="palette-planet" src="./liqueia-planet.png" alt="" />
         <header>
           <div className="palette-search">
             <Search />
@@ -542,7 +542,7 @@ function TabOverview({
               <button
                 className="tab-card-main"
                 onClick={() => {
-                  void window.liquea.activateTab(tab.id)
+                  void window.liqueia.activateTab(tab.id)
                   close()
                 }}
               >
@@ -557,10 +557,10 @@ function TabOverview({
                 </div>
               </button>
               <div className="tab-card-actions">
-                <IconButton label={`Duplicate ${tab.title}`} onClick={() => void window.liquea.duplicateTab(tab.id)}>
+                <IconButton label={`Duplicate ${tab.title}`} onClick={() => void window.liqueia.duplicateTab(tab.id)}>
                   <Copy />
                 </IconButton>
-                <IconButton label={`Close ${tab.title}`} onClick={() => void window.liquea.closeTab(tab.id)}>
+                <IconButton label={`Close ${tab.title}`} onClick={() => void window.liqueia.closeTab(tab.id)}>
                   <X />
                 </IconButton>
               </div>
@@ -569,7 +569,7 @@ function TabOverview({
           <button
             className="new-space-card liquid-glass"
             onClick={() => {
-              void window.liquea.createTab()
+              void window.liqueia.createTab()
               close()
             }}
           >
@@ -583,7 +583,7 @@ function TabOverview({
 }
 
 function friendlyHost(url: string): string {
-  if (url.startsWith('liquea://')) return url.replace('liquea://', 'Liquea · ')
+  if (url.startsWith('liqueia://')) return url.replace('liqueia://', 'Liqueia · ')
   try {
     return new URL(url).hostname.replace(/^www\./, '')
   } catch {
@@ -615,18 +615,9 @@ function NewTab({
   activeTab: TabState
 }): React.JSX.Element {
   const [query, setQuery] = useState('')
-  const [now, setNow] = useState(() => new Date())
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 30_000)
-    return () => window.clearInterval(timer)
-  }, [])
-  const greeting = useMemo(() => {
-    const hour = now.getHours()
-    return hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
-  }, [now])
   const navigate = (event: FormEvent): void => {
     event.preventDefault()
-    void window.liquea.navigate(activeTab.id, query)
+    void window.liqueia.navigate(activeTab.id, query)
   }
   return (
     <div className={`internal-page new-tab background-${snapshot.settings.newTabBackground}`}>
@@ -634,63 +625,18 @@ function NewTab({
       <div className="new-tab-liquid liquid-b" />
       <div className="new-tab-liquid liquid-c" />
       <div className="new-tab-content">
-        <header className="new-tab-heading">
-          <div>
-            <p className="eyebrow">{greeting}</p>
-            <h1>Move through the web<br /><em>like light through glass.</em></h1>
-          </div>
-          <div className="time-capsule liquid-glass">
-            <strong>{now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong>
-            <span><CalendarDays /> {now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}</span>
-          </div>
-        </header>
+        <img className="new-tab-planet" src="./liqueia-planet.png" alt="" />
+        <h1>Liqueia</h1>
         <form className="new-tab-search liquid-glass" onSubmit={navigate}>
           <span className="search-lens"><Search /></span>
           <input
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search the web"
+            placeholder="Search or enter an address"
           />
-          <span className="search-engine">Search with {snapshot.settings.searchEngine}</span>
           <kbd>↵</kbd>
         </form>
-        <div className="launch-grid">
-          <section className="journey-panel liquid-glass">
-            <header><span><Clock3 /> Recent currents</span><button onClick={() => void window.liquea.openInternalPage('history')}>See all</button></header>
-            <div className="journey-list">
-              {snapshot.history.slice(0, 3).map((entry, index) => (
-                <button key={entry.id} onClick={() => void window.liquea.navigate(activeTab.id, entry.url)}>
-                  <span className="journey-index">0{index + 1}</span>
-                  <span><strong>{entry.title}</strong><small>{friendlyHost(entry.url)}</small></span>
-                  <ArrowUpRight />
-                </button>
-              ))}
-              {!snapshot.history.length && <p>Your recent journeys will gather here.</p>}
-            </div>
-          </section>
-          <section className="places-panel">
-            {(snapshot.bookmarks.length ? snapshot.bookmarks.slice(0, 4) : [
-              { id: 'google', title: 'Google', url: 'https://google.com' },
-              { id: 'github', title: 'GitHub', url: 'https://github.com' }
-            ]).map((bookmark, index) => (
-              <button
-                key={bookmark.id}
-                className="place-orb liquid-glass"
-                onClick={() => void window.liquea.navigate(activeTab.id, bookmark.url)}
-              >
-                <span>{bookmark.title.slice(0, 1).toUpperCase()}</span>
-                <strong>{bookmark.title}</strong>
-                <small>0{index + 1}</small>
-              </button>
-            ))}
-          </section>
-          <aside className="pulse-panel liquid-glass">
-            <div className="pulse-ring"><Waves /><span /></div>
-            <div><p className="eyebrow">Liquea pulse</p><strong>{snapshot.tabs.length} {snapshot.tabs.length === 1 ? 'space' : 'spaces'} flowing</strong><small>{snapshot.bookmarks.length} places saved · Privacy active</small></div>
-          </aside>
-        </div>
-        <p className="privacy-note"><ShieldCheck /> Your browsing stays on this device <span>·</span> <Command /> K for Liquid Actions</p>
       </div>
     </div>
   )
@@ -698,11 +644,11 @@ function NewTab({
 
 function SettingsPage({ settings }: { settings: BrowserSettings }): React.JSX.Element {
   const update = (patch: Partial<BrowserSettings>): void => {
-    void window.liquea.updateSettings(patch)
+    void window.liqueia.updateSettings(patch)
   }
   return (
     <PageScaffold icon={<Settings />} eyebrow="Personalize" title="Settings">
-      <SettingsSection icon={<Palette />} title="Appearance" description="Shape Liquea around you.">
+      <SettingsSection icon={<Palette />} title="Appearance" description="Shape Liqueia around you.">
         <Segmented
           value={settings.themeMode}
           options={['light', 'dark', 'system']}
@@ -791,7 +737,7 @@ function SettingsPage({ settings }: { settings: BrowserSettings }): React.JSX.El
         <button
           className="danger-button"
           onClick={() =>
-            void window.liquea.clearBrowsingData({
+            void window.liqueia.clearBrowsingData({
               history: true,
               cache: true,
               cookies: true,
@@ -822,8 +768,8 @@ function BookmarksPage({
           title: bookmark.title,
           subtitle: bookmark.url,
           icon: <Star />,
-          action: () => void window.liquea.navigate(activeTab.id, bookmark.url),
-          secondary: () => void window.liquea.removeBookmark(bookmark.id)
+          action: () => void window.liqueia.navigate(activeTab.id, bookmark.url),
+          secondary: () => void window.liqueia.removeBookmark(bookmark.id)
         }))}
       />
     </PageScaffold>
@@ -846,7 +792,7 @@ function HistoryPage({
           title: entry.title,
           subtitle: `${new Date(entry.visitedAt).toLocaleString()} · ${entry.url}`,
           icon: <Clock3 />,
-          action: () => void window.liquea.navigate(activeTab.id, entry.url)
+          action: () => void window.liqueia.navigate(activeTab.id, entry.url)
         }))}
       />
     </PageScaffold>
@@ -866,7 +812,7 @@ function DownloadsPage({ snapshot }: { snapshot: BrowserSnapshot }): React.JSX.E
               ? `${Math.round((download.receivedBytes / Math.max(download.totalBytes, 1)) * 100)}%`
               : download.state,
           icon: <Download />,
-          action: () => void window.liquea.showDownload(download.id)
+          action: () => void window.liqueia.showDownload(download.id)
         }))}
       />
     </PageScaffold>
@@ -880,8 +826,8 @@ function ErrorPage({ tab }: { tab: TabState }): React.JSX.Element {
         <div className="page-icon"><Globe2 /></div>
         <p className="eyebrow">Connection interrupted</p>
         <h1>This page took a wrong turn.</h1>
-        <p>Liquea could not load {tab.url}. Check your connection or try again.</p>
-        <button className="primary-button" onClick={() => void window.liquea.reload(tab.id)}>
+        <p>Liqueia could not load {tab.url}. Check your connection or try again.</p>
+        <button className="primary-button" onClick={() => void window.liqueia.reload(tab.id)}>
           <RefreshCw /> Try again
         </button>
       </div>

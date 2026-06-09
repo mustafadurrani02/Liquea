@@ -1,11 +1,11 @@
-# Liquea
+# Liqueia
 
-Liquea is a functional desktop web browser with an original **Liquea Liquid Glass**
+Liqueia is a functional desktop web browser with an original **Liqueia Liquid Glass**
 interface. It combines a Chromium-powered browsing surface with a TypeScript browser
 shell designed around calm motion, rounded squircles, translucent depth, and warm
 gold accents.
 
-> **Project status:** early developer release. Liquea can browse real websites and
+> **Project status:** early developer release. Liqueia can browse real websites and
 > includes tabs, navigation, search, bookmarks, history, downloads, settings,
 > themes, keyboard shortcuts, internal pages, privacy controls, and tab crash states.
 > It is not yet recommended as a security-critical daily browser.
@@ -21,11 +21,11 @@ gold accents.
 - **React** provides predictable, component-based browser chrome with efficient
   updates.
 - **WebContentsView** gives every tab a real, isolated Chromium web contents surface.
-  Liquea does not use a fake iframe browser.
+  Liqueia does not use a fake iframe browser.
 - **electron-store** persists preferences, bookmarks, history, and download metadata.
 
-Chromium is the engine; Liquea's browser shell, visual design, state model, internal
-pages, settings, tab management, and persistence are original. Liquea is not a
+Chromium is the engine; Liqueia's browser shell, visual design, state model, internal
+pages, settings, tab management, and persistence are original. Liqueia is not a
 Chromium fork and does not claim to implement a new rendering engine.
 
 ## Features
@@ -108,7 +108,7 @@ npm run build
 src/
   main/       Native window, tabs, navigation, session, downloads, persistence
   preload/    Minimal typed IPC bridge; no Node.js access exposed to the UI
-  renderer/   React browser chrome and Liquea internal pages
+  renderer/   React browser chrome and Liqueia internal pages
   shared/     Cross-process types and defaults
 assets/       Brand assets
 screenshots/  Product screenshots
@@ -119,7 +119,7 @@ sandboxed and talks through a narrow preload API. Website tabs use sandboxed
 `WebContentsView` instances with Node integration disabled. A failed tab renderer
 is represented as a recoverable tab state instead of taking down the browser shell.
 
-## Liquea Liquid Glass
+## Liqueia Liquid Glass
 
 The design system uses layered translucent surfaces rather than flat panels:
 
@@ -160,7 +160,7 @@ current Linux package can run if LiquidOS provides:
 - standard desktop process, file, and networking APIs
 
 If LiquidOS uses a custom compositor, binary format, or application API, a dedicated
-Electron platform port or a native Liquea host will be required. No claim of native
+Electron platform port or a native Liqueia host will be required. No claim of native
 LiquidOS support is made until those system interfaces are defined and tested.
 
 ## Current Limitations
@@ -184,5 +184,5 @@ releases.
 
 ## License
 
-Liquea's original source code is available under the [MIT License](LICENSE).
+Liqueia's original source code is available under the [MIT License](LICENSE).
 Electron, Chromium, React, and other dependencies retain their own licenses.

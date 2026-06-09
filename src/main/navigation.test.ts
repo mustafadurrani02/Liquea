@@ -24,7 +24,7 @@ describe('resolveNavigationInput', () => {
     )
   })
 
-  it('recognizes Liquea internal pages', () => {
-    expect(resolveNavigationInput('liquea://settings', 'google')).toBe('liquea://settings')
+  it('recognizes Liqueia internal pages', () => {
+    expect(resolveNavigationInput('liqueia://settings', 'google')).toBe('liqueia://settings')
   })
 })

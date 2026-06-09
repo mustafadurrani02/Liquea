@@ -101,7 +101,7 @@ export const DEFAULT_SETTINGS: BrowserSettings = {
   accentColor: '#d8aa58',
   newTabBackground: 'aurora',
   searchEngine: 'google',
-  homepage: 'liquea://newtab',
+  homepage: 'liqueia://newtab',
   tabLayout: 'topbar',
   tabStyle: 'comfortable',
   sendDoNotTrack: true,

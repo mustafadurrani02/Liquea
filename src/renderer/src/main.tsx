@@ -6,15 +6,15 @@ import './styles.css'
 const root = document.getElementById('root')
 
 if (!root) {
-  throw new Error('Liquea could not find its application root.')
+  throw new Error('Liqueia could not find its application root.')
 }
 
-if (!window.liquea) {
+if (!window.liqueia) {
   root.innerHTML = `
     <main class="startup-error">
       <section>
-        <h1>Liquea could not start</h1>
-        <p>The secure browser bridge did not load. Restart Liquea or reinstall the application.</p>
+        <h1>Liqueia could not start</h1>
+        <p>The secure browser bridge did not load. Restart Liqueia or reinstall the application.</p>
       </section>
     </main>
   `

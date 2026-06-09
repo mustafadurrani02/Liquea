@@ -7,14 +7,14 @@ let mainWindow: BrowserWindow | null = null
 let controller: BrowserController | null = null
 
 function createWindow(): void {
-  const iconPath = join(__dirname, '../renderer/liquea-planet.png')
+  const iconPath = join(__dirname, '../renderer/liqueia-planet.png')
   const icon = nativeImage.createFromPath(iconPath)
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 920,
     minWidth: 960,
     minHeight: 640,
-    title: 'Liquea',
+    title: 'Liqueia',
     icon,
     backgroundColor: '#0b0c11',
     titleBarStyle: 'hiddenInset',
@@ -38,7 +38,7 @@ function createWindow(): void {
   installMenu(controller)
 
   mainWindow.webContents.on('preload-error', (_event, preloadPath, error) => {
-    console.error(`Liquea preload failed at ${preloadPath}:`, error)
+    console.error(`Liqueia preload failed at ${preloadPath}:`, error)
   })
 
   const rendererReady = process.env.ELECTRON_RENDERER_URL
@@ -46,7 +46,7 @@ function createWindow(): void {
     : mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
 
   void rendererReady.catch((error: unknown) => {
-    console.error('Failed to load the Liquea renderer:', error)
+    console.error('Failed to load the Liqueia renderer:', error)
   })
 
   mainWindow.webContents.once('did-finish-load', () => {
@@ -56,7 +56,7 @@ function createWindow(): void {
     'did-fail-load',
     (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
       if (isMainFrame) {
-        console.error('Liquea renderer failed to load', {
+        console.error('Liqueia renderer failed to load', {
           errorCode,
           errorDescription,
           validatedURL
@@ -65,7 +65,7 @@ function createWindow(): void {
     }
   )
   mainWindow.webContents.on('render-process-gone', (_event, details) => {
-    console.error('Liquea browser chrome renderer exited', details)
+    console.error('Liqueia browser chrome renderer exited', details)
   })
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -76,7 +76,7 @@ function createWindow(): void {
 function installMenu(browser: BrowserController): void {
   const template: Electron.MenuItemConstructorOptions[] = [
     {
-      label: 'Liquea',
+      label: 'Liqueia',
       submenu: [
         { role: 'about' },
         { type: 'separator' },

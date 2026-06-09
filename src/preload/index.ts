@@ -44,4 +44,4 @@ const api: BrowserAPI = {
   }
 }
 
-contextBridge.exposeInMainWorld('liquea', api)
+contextBridge.exposeInMainWorld('liqueia', api)

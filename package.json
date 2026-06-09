@@ -1,9 +1,9 @@
 {
-  "name": "liquea",
+  "name": "liqueia",
   "version": "0.1.0",
   "description": "A premium Liquid Glass desktop browser built with Electron, React, and TypeScript.",
   "main": "out/main/index.js",
-  "author": "Liquea contributors",
+  "author": "Liqueia contributors",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -43,8 +43,8 @@
     "vitest": "^4.0.15"
   },
   "build": {
-    "appId": "com.liquea.browser",
-    "productName": "Liquea",
+    "appId": "com.liqueia.browser",
+    "productName": "Liqueia",
     "asar": true,
     "directories": {
       "output": "release"
@@ -55,16 +55,16 @@
     ],
     "mac": {
       "category": "public.app-category.productivity",
-      "icon": "build/icons/liquea.icns",
+      "icon": "build/icons/liqueia.icns",
       "target": ["dmg", "zip"]
     },
     "win": {
-      "icon": "build/icons/liquea.ico",
+      "icon": "build/icons/liqueia.ico",
       "target": ["nsis", "portable"]
     },
     "linux": {
       "category": "Network",
-      "icon": "build/icons/liquea.png",
+      "icon": "build/icons/liqueia.png",
       "target": ["AppImage", "deb"]
     }
   }

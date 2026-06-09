@@ -8,16 +8,16 @@ const SEARCH_URLS: Record<SearchEngine, string> = {
 }
 
 export const INTERNAL_PAGES = new Set([
-  'liquea://newtab',
-  'liquea://settings',
-  'liquea://history',
-  'liquea://bookmarks',
-  'liquea://downloads'
+  'liqueia://newtab',
+  'liqueia://settings',
+  'liqueia://history',
+  'liqueia://bookmarks',
+  'liqueia://downloads'
 ])
 
 export function resolveNavigationInput(input: string, searchEngine: SearchEngine): string {
   const value = input.trim()
-  if (!value) return 'liquea://newtab'
+  if (!value) return 'liqueia://newtab'
   if (INTERNAL_PAGES.has(value)) return value
 
   try {
